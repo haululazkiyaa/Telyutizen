@@ -1,0 +1,28 @@
+@import "@/styles/colors.scss";
+
+.blur {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.search {
+  padding-left: 60px !important;
+}
+
+.btn {
+  &__primary {
+    background: map-get($map: $schema, $key: gradientRight);
+    &:hover {
+      background: map-get($map: $schema, $key: gradientLeft);
+    }
+  }
+}
+
+.aside {
+  background: linear-gradient(90deg, #425181, #7c4fb5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}

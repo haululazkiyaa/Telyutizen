@@ -15,7 +15,7 @@ type Item = {
 };
 
 export default function HomePage() {
-  const [loadData, setLoadData] = useState(false);
+  const [loadData, setLoadData] = useState(true);
   const [rawData, setRawData] = useState([] as any[]);
   const [listData, setListData] = useState([]);
 

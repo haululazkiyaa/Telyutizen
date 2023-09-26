@@ -28,16 +28,24 @@ export default function Navbar() {
                     className="text-decoration-none text-black"
                     href="/dashboard"
                   >
-                    🗃️ Dashboard
+                    🗃️ Admin
                   </Link>
                 )}
               </li>
               <li className="list-inline-item ms-3">
                 <Link
                   className="text-decoration-none text-black"
+                  href="/homework"
+                >
+                  💻 Tugas
+                </Link>
+              </li>
+              <li className="list-inline-item ms-3">
+                <Link
+                  className="text-decoration-none text-black"
                   href="https://github.com/haululazkiyaa/Telyutizen"
                 >
-                  💻 Contribute
+                  💻 Kontribusi
                 </Link>
               </li>
             </ul>

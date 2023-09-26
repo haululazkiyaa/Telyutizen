@@ -1,14 +1,15 @@
 import {
-  getFirestore,
-  getDocs,
-  collection,
-  query,
-  where,
   addDoc,
-  or,
+  collection,
   deleteDoc,
   doc,
+  getDocs,
+  getFirestore,
+  or,
+  query,
+  where,
 } from "firebase/firestore";
+
 import app from "./init";
 import bcrypt from "bcrypt";
 
@@ -137,6 +138,70 @@ export async function deleteData(
       callback({
         status: true,
         message: "Delete data success",
+      });
+    })
+    .catch((error) => {
+      callback({
+        status: false,
+        message: error,
+      });
+    });
+}
+
+export async function addHomework(
+  homeworkData: {
+    homeworkTitle: string;
+    homeworkDeadline: Date;
+    homeworkLink: string;
+  },
+  callback: Function
+) {
+  const q = query(
+    collection(firestore, "homework"),
+    or(
+      where("appName", "==", homeworkData.homeworkTitle),
+      where("appLink", "==", homeworkData.homeworkLink)
+    )
+  );
+  const snapshot = await getDocs(q);
+  const data = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  if (data.length > 0) {
+    callback({
+      status: false,
+      message: "Homework already exist",
+    });
+  } else {
+    await addDoc(collection(firestore, "homework"), homeworkData)
+      .then(() => {
+        callback({
+          status: true,
+          message: "Add homework success",
+        });
+      })
+      .catch((error) => {
+        callback({
+          status: false,
+          message: error,
+        });
+      });
+  }
+}
+
+export async function deleteHomework(
+  homeworkData: {
+    id: string;
+  },
+  callback: Function
+) {
+  await deleteDoc(doc(firestore, "homework", homeworkData.id))
+    .then(() => {
+      callback({
+        status: true,
+        message: "Delete homework success",
       });
     })
     .catch((error) => {

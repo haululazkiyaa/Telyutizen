@@ -5,16 +5,17 @@ import Image from "next/image";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import Swal from "sweetalert2";
-import styles from "./Dashboard.module.scss";
+import styles from "./Homework.module.scss";
 import { useSession } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 type Item = {
   id: string;
-  appName: string;
-  appLink: string;
+  homeworkTitle: string;
+  homeworkDeadline: Date;
+  homeworkLink: string;
 };
-export default function DashboardView() {
+export default function HomeworkView() {
   const { data }: any = useSession();
   const [loadData, setLoadData] = useState(true);
   const [submitData, setSubmitData] = useState(false);
@@ -27,7 +28,7 @@ export default function DashboardView() {
 
   const retrieveData = () => {
     setLoadData(true);
-    fetch("/api/data")
+    fetch("/api/homework/data")
       .then((res) => res.json())
       .then((res) => {
         setRawData(res.data);
@@ -40,10 +41,11 @@ export default function DashboardView() {
     setSubmitData(true);
     e.preventDefault();
     const data = {
-      appName: e.target.appName.value,
-      appLink: e.target.appLink.value,
+      homeworkTitle: e.target.homeworkTitle.value,
+      homeworkDeadline: e.target.homeworkDeadline.value,
+      homeworkLink: e.target.homeworkLink.value,
     };
-    const result = await fetch("/api/addData", {
+    const result = await fetch("/api/homework/addData", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -88,7 +90,7 @@ export default function DashboardView() {
       confirmButtonText: "Yes, delete it!",
     }).then(async (btn) => {
       if (btn.isConfirmed) {
-        const result = await fetch("/api/deleteData", {
+        const result = await fetch("/api/homework/deleteData", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -170,7 +172,7 @@ export default function DashboardView() {
           <div className="row">
             <div className="col-md-8">
               <main>
-                <h2>List Aplikasi:</h2>
+                <h2>List Tugas:</h2>
                 {loadData && (
                   <div className="d-flex align-items-center justify-content-center">
                     <div
@@ -189,12 +191,13 @@ export default function DashboardView() {
                     >
                       <div className="d-flex align-items-center justify-content-between">
                         <div>
-                          <h3>{item.appName} ✅</h3>
+                          <h3>{item.homeworkTitle} ✅</h3>
+                          <p>📅 {item.homeworkDeadline.toString()} </p>
                           <Link
                             className="text-decoration-none text-black"
-                            href={item.appLink}
+                            href={item.homeworkLink}
                           >
-                            🔗 {item.appLink}
+                            🔗 {item.homeworkLink}
                           </Link>
                         </div>
                         <div>
@@ -217,22 +220,29 @@ export default function DashboardView() {
               <aside
                 className={`rounded-4 shadow-sm px-3 p-3 text-white ${styles.aside}`}
               >
-                <h2>Tambah Data 📨</h2>
-                <p>Silahkan inputkan data baru</p>
+                <h2>Tambah Tugas 📨</h2>
+                <p>Silahkan inputkan tugas baru</p>
                 <form onSubmit={handleSubmit}>
                   <input
                     className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white ${styles.blur}`}
                     type="text"
-                    id="appName"
-                    name="appName"
-                    placeholder="Nama Aplikasi"
+                    id="homeworkTitle"
+                    name="homeworkTitle"
+                    placeholder="Judul Tugas"
                   />
                   <input
                     className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white  ${styles.blur}`}
+                    type="date"
+                    id="homeworkDeadline"
+                    name="homeworkDeadline"
+                    placeholder="Deadline Tugas"
+                  />
+                  <input
+                    className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white ${styles.blur}`}
                     type="text"
-                    id="appLink"
-                    name="appLink"
-                    placeholder="Link Aplikasi"
+                    id="homeworkLink"
+                    name="homeworkLink"
+                    placeholder="Link Tugas"
                   />
                   <button
                     className={`w-100 border border-0 rounded-pill shadow-sm px-4 py-2 text-white ${styles.btn__primary}`}

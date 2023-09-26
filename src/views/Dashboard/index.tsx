@@ -1,11 +1,12 @@
+import { useEffect, useState } from "react";
+
 import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
-import styles from "./Dashboard.module.scss";
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Swal from "sweetalert2";
+import styles from "./Dashboard.module.scss";
+import { useSession } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 type Item = {
@@ -15,25 +16,28 @@ type Item = {
 };
 export default function DashboardView() {
   const { data }: any = useSession();
+  const [loadData, setLoadData] = useState(false);
+  const [submitData, setSubmitData] = useState(false);
   const [rawData, setRawData] = useState([] as any[]);
   const [listData, setListData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     retrieveData();
   }, []);
 
   const retrieveData = () => {
+    setLoadData(true);
     fetch("/api/data")
       .then((res) => res.json())
       .then((res) => {
         setRawData(res.data);
         setListData(res.data);
       });
+    setLoadData(false);
   };
 
   const handleSubmit = async (e: any) => {
-    setIsLoading(true);
+    setSubmitData(true);
     e.preventDefault();
     const data = {
       appName: e.target.appName.value,
@@ -49,7 +53,7 @@ export default function DashboardView() {
 
     if (result.status === 200) {
       e.target.reset();
-      setIsLoading(false);
+      setSubmitData(false);
       Swal.fire({
         icon: "success",
         title: "Add data success 🎉",
@@ -65,12 +69,12 @@ export default function DashboardView() {
         text: "Failed to add data, please double check your input, make sure there are no duplicates",
         confirmButtonText: "Oke",
       });
-      setIsLoading(false);
+      setSubmitData(false);
     }
   };
 
   const handleDelete = (dataId: string) => {
-    setIsLoading(true);
+    setSubmitData(true);
     const data = {
       id: dataId,
     };
@@ -93,7 +97,7 @@ export default function DashboardView() {
         });
 
         if (result.status === 200) {
-          setIsLoading(false);
+          setSubmitData(false);
           Swal.fire({
             icon: "success",
             title: "Delete data success 🎉",
@@ -109,7 +113,7 @@ export default function DashboardView() {
             text: "Failed to delete data",
             confirmButtonText: "Oke",
           });
-          setIsLoading(false);
+          setSubmitData(false);
         }
       }
     });
@@ -165,8 +169,18 @@ export default function DashboardView() {
         <div className="container">
           <div className="row">
             <div className="col-md-8">
-              <h2>List Aplikasi:</h2>
               <main>
+                <h2>List Aplikasi:</h2>
+                {loadData && (
+                  <div className="d-flex align-items-center justify-content-center">
+                    <div
+                      className="spinner-border"
+                      style={{ width: "50px", height: "50px" }}
+                      role="status"
+                    ></div>
+                    <span className="ms-3">Memuat data...</span>
+                  </div>
+                )}
                 {listData.length !== 0 ? (
                   listData.map((item: Item, index: number) => (
                     <article
@@ -223,8 +237,20 @@ export default function DashboardView() {
                   <button
                     className={`w-100 border border-0 rounded-pill shadow-sm px-4 py-2 text-white ${styles.btn__primary}`}
                     type="submit"
+                    disabled={submitData}
                   >
-                    Simpan
+                    {submitData ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        <span className="sr-only mr-3">Menyimpan ...</span>
+                      </>
+                    ) : (
+                      <>Simpan</>
+                    )}
                   </button>
                 </form>
               </aside>

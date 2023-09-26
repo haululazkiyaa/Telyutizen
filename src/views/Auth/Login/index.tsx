@@ -1,18 +1,18 @@
-import { useState } from "react";
-import styles from "./Login.module.scss";
-import { useRouter } from "next/router";
+import Head from "next/head";
 import Swal from "sweetalert2";
 import { signIn } from "next-auth/react";
-import Head from "next/head";
+import styles from "./Login.module.scss";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 export default function LoginView() {
   const { push, query } = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [submitData, setSubmitData] = useState(false);
   const [error, setError] = useState("");
   const callbackUrl: any = query.callbackUrl || "/dashboard";
 
   const handleSubmit = async (e: any) => {
-    setIsLoading(true);
+    setSubmitData(true);
     setError("");
     e.preventDefault();
 
@@ -25,13 +25,12 @@ export default function LoginView() {
       });
 
       if (!res?.error) {
-        setIsLoading(false);
+        setSubmitData(false);
         Swal.fire({
           icon: "success",
           title: "Login success 🎉",
-          text: "🕒 Please wait, redirecting you to login page...",
           showConfirmButton: false,
-          timer: 3000,
+          timer: 1500,
         });
         push(callbackUrl);
       } else {
@@ -42,7 +41,7 @@ export default function LoginView() {
           text: res.error,
           confirmButtonText: "Oke",
         });
-        setIsLoading(false);
+        setSubmitData(false);
       }
     } catch (error: any) {
       setError(error);
@@ -52,7 +51,7 @@ export default function LoginView() {
         text: error,
         confirmButtonText: "Oke",
       });
-      setIsLoading(false);
+      setSubmitData(false);
     }
   };
 
@@ -82,24 +81,38 @@ export default function LoginView() {
               </div>
               <form onSubmit={handleSubmit}>
                 <input
-                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white ${styles.blur}`}
+                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-black ${styles.blur}`}
                   type="email"
                   id="email"
                   name="email"
                   placeholder="Email"
+                  disabled={submitData}
                 />
                 <input
-                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white  ${styles.blur}`}
+                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-black  ${styles.blur}`}
                   type="text"
                   id="password"
                   name="password"
                   placeholder="Password"
+                  disabled={submitData}
                 />
                 <button
                   className={`w-100 border border-0 rounded-pill shadow-sm px-4 py-2 text-white ${styles.btn__primary}`}
                   type="submit"
+                  disabled={submitData}
                 >
-                  {isLoading ? "Loading..." : "Masuk ke Akun ✅"}
+                  {submitData ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      <span className="sr-only mr-3">Mencoba Login ...</span>
+                    </>
+                  ) : (
+                    <>Masuk ke Akun ✅</>
+                  )}
                 </button>
               </form>
             </aside>

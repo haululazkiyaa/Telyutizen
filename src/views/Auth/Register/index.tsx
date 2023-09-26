@@ -1,16 +1,16 @@
-import { useState } from "react";
+import Head from "next/head";
+import Swal from "sweetalert2";
 import styles from "./Register.module.scss";
 import { useRouter } from "next/router";
-import Swal from "sweetalert2";
-import Head from "next/head";
+import { useState } from "react";
 
 export default function RegisterView() {
   const { push } = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [submitData, setSubmitData] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: any) => {
-    setIsLoading(true);
+    setSubmitData(true);
     setError("");
     e.preventDefault();
     const data = {
@@ -28,7 +28,7 @@ export default function RegisterView() {
 
     if (result.status === 200) {
       e.target.reset();
-      setIsLoading(false);
+      setSubmitData(false);
       Swal.fire({
         icon: "success",
         title: "Register success 🎉",
@@ -49,7 +49,7 @@ export default function RegisterView() {
           : "Error! please try again later",
         confirmButtonText: "Oke",
       });
-      setIsLoading(false);
+      setSubmitData(false);
     }
   };
 
@@ -72,32 +72,46 @@ export default function RegisterView() {
               <p>Silahkan membuat akun terlebih dahulu</p>
               <form onSubmit={handleSubmit}>
                 <input
-                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white ${styles.blur}`}
+                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-black ${styles.blur}`}
                   type="text"
                   id="fullName"
                   name="fullName"
                   placeholder="Nama Lengkap"
+                  disabled={submitData}
                 />
                 <input
-                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white ${styles.blur}`}
+                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-black ${styles.blur}`}
                   type="email"
                   id="email"
                   name="email"
                   placeholder="Email"
+                  disabled={submitData}
                 />
                 <input
-                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white  ${styles.blur}`}
+                  className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-black  ${styles.blur}`}
                   type="text"
                   id="password"
                   name="password"
                   placeholder="Password"
+                  disabled={submitData}
                 />
                 <button
                   className={`w-100 border border-0 rounded-pill shadow-sm px-4 py-2 text-white ${styles.btn__primary}`}
                   type="submit"
-                  disabled={isLoading}
+                  disabled={submitData}
                 >
-                  {isLoading ? "Loading..." : "Buat Akun ✅"}
+                  {submitData ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      <span className="sr-only mr-3">Mencoba Login ...</span>
+                    </>
+                  ) : (
+                    <>Masuk ke Akun ✅</>
+                  )}
                 </button>
               </form>
             </aside>

@@ -1,9 +1,10 @@
+import { useEffect, useState } from "react";
+
 import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.scss";
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import styles from "@/styles/Home.module.scss";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,6 +15,7 @@ type Item = {
 };
 
 export default function HomePage() {
+  const [loadData, setLoadData] = useState(false);
   const [rawData, setRawData] = useState([] as any[]);
   const [listData, setListData] = useState([]);
 
@@ -22,12 +24,14 @@ export default function HomePage() {
   }, []);
 
   const retrieveData = () => {
+    setLoadData(true);
     fetch("/api/data")
       .then((res) => res.json())
       .then((res) => {
         setRawData(res.data);
         setListData(res.data);
       });
+    setLoadData(false);
   };
 
   const handleSearch = (e: any) => {
@@ -92,6 +96,16 @@ export default function HomePage() {
             <div className="col-md-8">
               <main>
                 <h2>List Aplikasi 🗂️</h2>
+                {loadData && (
+                  <div className="d-flex align-items-center justify-content-center">
+                    <div
+                      className="spinner-border"
+                      style={{ width: "50px", height: "50px" }}
+                      role="status"
+                    ></div>
+                    <span className="ms-3">Memuat data...</span>
+                  </div>
+                )}
                 {listData.length !== 0 ? (
                   listData.map((item: Item, index: number) => (
                     <article

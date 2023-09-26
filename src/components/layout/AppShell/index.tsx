@@ -1,5 +1,6 @@
-import React from "react";
+import Footer from "../Footer";
 import Navbar from "../Navbar";
+import React from "react";
 import { useRouter } from "next/router";
 
 type AppShellProps = {
@@ -16,6 +17,7 @@ export default function AppShell(props: AppShellProps) {
     <>
       {!disableNavbar.includes(pathname) && <Navbar />}
       {children}
+      {!disableNavbar.includes(pathname) && <Footer />}
     </>
   );
 }

@@ -1,7 +1,8 @@
+import { signOut, useSession } from "next-auth/react";
+
 import Image from "next/image";
-import styles from "@/styles/Home.module.scss";
-import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import styles from "@/styles/Home.module.scss";
 
 export default function Navbar() {
   const { data }: any = useSession();

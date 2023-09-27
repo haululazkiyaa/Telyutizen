@@ -33,6 +33,34 @@ export default function HomeworkView() {
       .then((res) => {
         setRawData(res.data);
         setListData(res.data);
+
+        let htmlContent: any = "<div>";
+        // let dateNow: any = new Date().getTime();
+        let idx: number = 1;
+        for (let i of res.data) {
+          // let deadlineDate: any = new Date(i.homeworkDeadline).getTime();
+          // var hours = Math.floor(
+          //   ((deadlineDate - dateNow) % (1000 * 60 * 60 * 24)) /
+          //     (1000 * 60 * 60)
+          // );
+          // console.log(hours);
+          htmlContent += `<p>${idx}. ${i.homeworkTitle}</p>`;
+          idx++;
+        }
+        htmlContent += "</div>";
+
+        Swal.fire({
+          title: "Deadline Tugas",
+          icon: "warning",
+          html: htmlContent,
+          showCloseButton: true,
+          showCancelButton: false,
+          focusConfirm: false,
+          confirmButtonText: '<i class="fa fa-thumbs-up"></i> Oke!',
+          confirmButtonAriaLabel: "",
+          cancelButtonText: "",
+          cancelButtonAriaLabel: "",
+        });
       });
     setLoadData(false);
   };

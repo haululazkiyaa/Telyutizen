@@ -1,4 +1,5 @@
 import {
+  Timestamp,
   addDoc,
   collection,
   deleteDoc,
@@ -151,6 +152,8 @@ export async function deleteData(
 export async function addHomework(
   homeworkData: {
     homeworkTitle: string;
+    homeworkType: string;
+    homeworkCoverage: string;
     homeworkDeadline: Date;
     homeworkLink: string;
   },
@@ -159,8 +162,8 @@ export async function addHomework(
   const q = query(
     collection(firestore, "homework"),
     or(
-      where("appName", "==", homeworkData.homeworkTitle),
-      where("appLink", "==", homeworkData.homeworkLink)
+      where("homeworkTitle", "==", homeworkData.homeworkTitle),
+      where("homeworkLink", "==", homeworkData.homeworkLink)
     )
   );
   const snapshot = await getDocs(q);
@@ -168,7 +171,6 @@ export async function addHomework(
     id: doc.id,
     ...doc.data(),
   }));
-
   if (data.length > 0) {
     callback({
       status: false,

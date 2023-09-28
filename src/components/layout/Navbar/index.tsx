@@ -2,6 +2,7 @@ import { signOut, useSession } from "next-auth/react";
 
 import Image from "next/image";
 import Link from "next/link";
+import { notification } from "@/components/function/Notification";
 import styles from "@/styles/Home.module.scss";
 
 export default function Navbar() {
@@ -50,9 +51,19 @@ export default function Navbar() {
               </li>
             </ul>
           </nav>
+          <button
+            type="button"
+            className={`position-relative me-3 border border-0 rounded-pill shadow-sm px-3 py-2 text-white ${styles.btn__primary}`}
+            onClick={() => notification()}
+          >
+            🔔 Deadline
+            <span className="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle mt-2">
+              <span className="visually-hidden">New</span>
+            </span>
+          </button>
           {data ? (
             <button
-              className={`border border-0 rounded-pill shadow-sm px-4 py-2 text-white ${styles.btn__primary}`}
+              className={`border border-0 rounded-pill shadow-sm px-3 py-2 text-white ${styles.btn__primary}`}
               onClick={() => signOut()}
             >
               ⛔️ Logout

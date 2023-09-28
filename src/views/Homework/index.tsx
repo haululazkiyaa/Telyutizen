@@ -5,6 +5,8 @@ import Image from "next/image";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import Swal from "sweetalert2";
+import { TimeDifference } from "@/components/fragment/TimeDifference";
+import { notification } from "@/components/function/Notification";
 import styles from "./Homework.module.scss";
 import { useSession } from "next-auth/react";
 
@@ -12,6 +14,8 @@ const inter = Inter({ subsets: ["latin"] });
 type Item = {
   id: string;
   homeworkTitle: string;
+  homeworkType: string;
+  homeworkCoverage: string;
   homeworkDeadline: Date;
   homeworkLink: string;
 };
@@ -24,6 +28,7 @@ export default function HomeworkView() {
 
   useEffect(() => {
     retrieveData();
+    notification();
   }, []);
 
   const retrieveData = () => {
@@ -31,36 +36,15 @@ export default function HomeworkView() {
     fetch("/api/homework/data")
       .then((res) => res.json())
       .then((res) => {
-        setRawData(res.data);
-        setListData(res.data);
-
-        let htmlContent: any = "<div>";
-        // let dateNow: any = new Date().getTime();
-        let idx: number = 1;
-        for (let i of res.data) {
-          // let deadlineDate: any = new Date(i.homeworkDeadline).getTime();
-          // var hours = Math.floor(
-          //   ((deadlineDate - dateNow) % (1000 * 60 * 60 * 24)) /
-          //     (1000 * 60 * 60)
-          // );
-          // console.log(hours);
-          htmlContent += `<p>${idx}. ${i.homeworkTitle}</p>`;
-          idx++;
-        }
-        htmlContent += "</div>";
-
-        Swal.fire({
-          title: "Deadline Tugas",
-          icon: "warning",
-          html: htmlContent,
-          showCloseButton: true,
-          showCancelButton: false,
-          focusConfirm: false,
-          confirmButtonText: '<i class="fa fa-thumbs-up"></i> Oke!',
-          confirmButtonAriaLabel: "",
-          cancelButtonText: "",
-          cancelButtonAriaLabel: "",
+        let listData: any = res.data;
+        listData.sort((a: any, b: any) => {
+          return (
+            new Date(a.homeworkDeadline).getTime() -
+            new Date(b.homeworkDeadline).getTime()
+          );
         });
+        setRawData(listData);
+        setListData(listData);
       });
     setLoadData(false);
   };
@@ -70,6 +54,8 @@ export default function HomeworkView() {
     e.preventDefault();
     const data = {
       homeworkTitle: e.target.homeworkTitle.value,
+      homeworkType: e.target.homeworkType.value,
+      homeworkCoverage: e.target.homeworkCoverage.value,
       homeworkDeadline: e.target.homeworkDeadline.value,
       homeworkLink: e.target.homeworkLink.value,
     };
@@ -161,6 +147,24 @@ export default function HomeworkView() {
     setListData(temp);
   };
 
+  const convertDate = (date: Date) => {
+    let newDate = new Date(date);
+    return newDate.toLocaleDateString("id-ID", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const convertTime = (time: Date) => {
+    let newTime = new Date(time);
+    return newTime.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <>
       <Head>
@@ -200,8 +204,8 @@ export default function HomeworkView() {
           <div className="row">
             <div className="col-md-8">
               <main>
-                <h2>List Tugas:</h2>
-                {loadData && (
+                <h2>DAFTAR TUGAS</h2>
+                {loadData && listData.length == 0 && (
                   <div className="d-flex align-items-center justify-content-center">
                     <div
                       className="spinner-border"
@@ -211,37 +215,64 @@ export default function HomeworkView() {
                     <span className="ms-3">Memuat data...</span>
                   </div>
                 )}
-                {listData.length !== 0 ? (
+                {!loadData &&
+                  listData.length != 0 &&
                   listData.map((item: Item, index: number) => (
                     <article
                       key={index}
                       className={`rounded-4 shadow-sm p-3 mb-3 ${styles.blur}`}
                     >
-                      <div className="d-flex align-items-center justify-content-between">
+                      <div>
                         <div>
-                          <h3>{item.homeworkTitle} ✅</h3>
-                          <p>📅 {item.homeworkDeadline.toString()} </p>
-                          <Link
-                            className="text-decoration-none text-black"
-                            href={item.homeworkLink}
-                          >
-                            🔗 {item.homeworkLink}
-                          </Link>
-                        </div>
-                        <div>
-                          <button
-                            className="border-2 rounded-pill shadow-sm px-4 py-2 bg-white btn btn-outline-danger"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            🗑️
-                          </button>
+                          {TimeDifference(item.homeworkDeadline) <= 3 && (
+                            <p
+                              className={`badge rounded-pill text-bg-danger ${styles.blink}`}
+                            >
+                              Deadline Sudah Dekat
+                            </p>
+                          )}
+                          <h3>{item.homeworkTitle}</h3>
+                          <p>
+                            📚 Tipe Tugas:
+                            <span className="badge rounded-pill text-bg-secondary ms-2">
+                              {item.homeworkType} - {item.homeworkCoverage}
+                            </span>
+                          </p>
+                          <p>
+                            📅 Deadline:
+                            <span className="badge rounded-pill text-bg-success ms-2">
+                              {convertDate(item.homeworkDeadline)}
+                            </span>
+                            <span className="badge rounded-pill text-bg-primary ms-2">
+                              {convertTime(item.homeworkDeadline)} WIB
+                            </span>
+                          </p>
+                          <div className="d-flex align-items-center justify-content-start">
+                            <Link
+                              className="border-2 rounded-pill shadow-sm px-3 py-2 bg-white btn btn-outline-success text-black me-2"
+                              href={item.homeworkLink}
+                            >
+                              ↗️ Buka LMS
+                            </Link>
+                            <button
+                              className="border-2 rounded-pill shadow-sm px-3 py-2 bg-white btn btn-outline-warning text-black me-2"
+                              onClick={() => handleDelete(item.id)}
+                              disabled
+                            >
+                              🖊️ Edit
+                            </button>
+                            <button
+                              className="border-2 rounded-pill shadow-sm px-3 py-2 bg-white btn btn-outline-danger text-black"
+                              onClick={() => handleDelete(item.id)}
+                            >
+                              🗑️ Hapus
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </article>
-                  ))
-                ) : (
-                  <p>Tidak ada data</p>
-                )}
+                  ))}
+                {!loadData && listData.length == 0 && <p>Tidak ada data</p>}
               </main>
             </div>
             <div className="col-md-4">
@@ -257,20 +288,50 @@ export default function HomeworkView() {
                     id="homeworkTitle"
                     name="homeworkTitle"
                     placeholder="Judul Tugas"
+                    required
                   />
                   <input
                     className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white  ${styles.blur}`}
-                    type="date"
+                    type="datetime-local"
                     id="homeworkDeadline"
                     name="homeworkDeadline"
                     placeholder="Deadline Tugas"
+                    required
                   />
+                  <select
+                    className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white ${styles.blur}`}
+                    id="homeworkType"
+                    name="homeworkType"
+                    defaultValue=""
+                    required
+                  >
+                    <option value="" disabled>
+                      Pilih Tipe Tugas
+                    </option>
+                    <option value="Quiz">Quiz</option>
+                    <option value="Assignment">Assignment</option>
+                    <option value="Tubes">Tubes</option>
+                  </select>
+                  <select
+                    className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white ${styles.blur}`}
+                    id="homeworkCoverage"
+                    name="homeworkCoverage"
+                    defaultValue=""
+                    required
+                  >
+                    <option value="" disabled>
+                      Pilih Cakupan Tugas
+                    </option>
+                    <option value="Individu">Individu</option>
+                    <option value="Kelompok">Kelompok</option>
+                  </select>
                   <input
                     className={`w-100 rounded-pill shadow-sm mb-2 p-2 text-white ${styles.blur}`}
                     type="text"
                     id="homeworkLink"
                     name="homeworkLink"
                     placeholder="Link Tugas"
+                    required
                   />
                   <button
                     className={`w-100 border border-0 rounded-pill shadow-sm px-4 py-2 text-white ${styles.btn__primary}`}

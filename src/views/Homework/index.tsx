@@ -21,10 +21,11 @@ type Item = {
 };
 export default function HomeworkView() {
   const { data }: any = useSession();
-  const [loadData, setLoadData] = useState(true);
+  const [loadData, setLoadData] = useState(false);
   const [submitData, setSubmitData] = useState(false);
   const [rawData, setRawData] = useState([] as any[]);
   const [listData, setListData] = useState([]);
+  const [previousData, setPreviousData] = useState([]);
 
   useEffect(() => {
     retrieveData();
@@ -36,17 +37,27 @@ export default function HomeworkView() {
     fetch("/api/homework/data")
       .then((res) => res.json())
       .then((res) => {
-        let listData: any = res.data;
-        listData.sort((a: any, b: any) => {
+        let data: any = res.data;
+        data.sort((a: any, b: any) => {
           return (
             new Date(a.homeworkDeadline).getTime() -
             new Date(b.homeworkDeadline).getTime()
           );
         });
-        setRawData(listData);
-        setListData(listData);
+        let ongoingTask: any = [];
+        let previousTask: any = [];
+        for (let item of data) {
+          if (TimeDifference(item.homeworkDeadline) < 0) {
+            previousTask.push(item);
+          } else {
+            ongoingTask.push(item);
+          }
+        }
+        setRawData(ongoingTask);
+        setListData(ongoingTask);
+        setPreviousData(previousTask);
+        setLoadData(false);
       });
-    setLoadData(false);
   };
 
   const handleSubmit = async (e: any) => {
@@ -135,6 +146,8 @@ export default function HomeworkView() {
     });
   };
 
+  const handleUpdate = (dataId: string) => {};
+
   const handleSearch = (e: any) => {
     e.preventDefault();
     const temp: any = [];
@@ -204,7 +217,7 @@ export default function HomeworkView() {
           <div className="row">
             <div className="col-md-8">
               <main>
-                <h2>DAFTAR TUGAS</h2>
+                <h2>🗃️ DAFTAR TUGAS</h2>
                 {loadData && listData.length == 0 && (
                   <div className="d-flex align-items-center justify-content-center">
                     <div
@@ -252,12 +265,11 @@ export default function HomeworkView() {
                               className="border-2 rounded-pill shadow-sm px-3 py-2 bg-white btn btn-outline-success text-black me-2"
                               href={item.homeworkLink}
                             >
-                              ↗️ Buka LMS
+                              ↗️ Lihat di LMS
                             </Link>
                             <button
-                              className="border-2 rounded-pill shadow-sm px-3 py-2 bg-white btn btn-outline-warning text-black me-2"
-                              onClick={() => handleDelete(item.id)}
-                              disabled
+                              className="border-2 rounded-pill shadow-sm px-3 py-2 bg-white btn btn-outline-warning text-black me-2 opacity-50"
+                              onClick={() => handleUpdate(item.id)}
                             >
                               🖊️ Edit
                             </button>
@@ -273,6 +285,30 @@ export default function HomeworkView() {
                     </article>
                   ))}
                 {!loadData && listData.length == 0 && <p>Tidak ada data</p>}
+                <h2>🗃️ TUGAS SUDAH LEWAT</h2>
+                {!loadData &&
+                  previousData.length != 0 &&
+                  previousData.map((item: Item, index: number) => (
+                    <article
+                      key={index}
+                      className={`rounded-4 shadow-sm p-3 mb-3 ${styles.blur}`}
+                    >
+                      <div>
+                        <div>
+                          <h3>{item.homeworkTitle}</h3>
+                          <div className="d-flex align-items-center justify-content-start">
+                            <Link
+                              className="border-2 rounded-pill shadow-sm px-3 py-2 bg-white btn btn-outline-success text-black me-2"
+                              href={item.homeworkLink}
+                            >
+                              ↗️ Lihat di LMS
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                {!loadData && previousData.length == 0 && <p>Tidak ada data</p>}
               </main>
             </div>
             <div className="col-md-4">

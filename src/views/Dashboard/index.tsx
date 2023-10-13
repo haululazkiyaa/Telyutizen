@@ -16,7 +16,7 @@ type Item = {
 };
 export default function DashboardView() {
   const { data }: any = useSession();
-  const [loadData, setLoadData] = useState(true);
+  const [loadData, setLoadData] = useState(false);
   const [submitData, setSubmitData] = useState(false);
   const [rawData, setRawData] = useState([] as any[]);
   const [listData, setListData] = useState([]);
@@ -32,8 +32,8 @@ export default function DashboardView() {
       .then((res) => {
         setRawData(res.data);
         setListData(res.data);
+        setLoadData(false);
       });
-    setLoadData(false);
   };
 
   const handleSubmit = async (e: any) => {
@@ -189,12 +189,12 @@ export default function DashboardView() {
                     >
                       <div className="d-flex align-items-center justify-content-between">
                         <div>
-                          <h3>{item.appName} ✅</h3>
+                          <h3>{item.appName}</h3>
                           <Link
-                            className="text-decoration-none text-black"
+                            className="border-2 rounded-pill shadow-sm px-3 py-2 bg-white btn btn-outline-success text-black me-2"
                             href={item.appLink}
                           >
-                            🔗 {item.appLink}
+                            ↗️ Buka LMS
                           </Link>
                         </div>
                         <div>

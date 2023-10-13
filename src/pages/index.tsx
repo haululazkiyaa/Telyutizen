@@ -15,7 +15,7 @@ type Item = {
 };
 
 export default function HomePage() {
-  const [loadData, setLoadData] = useState(true);
+  const [loadData, setLoadData] = useState(false);
   const [rawData, setRawData] = useState([] as any[]);
   const [listData, setListData] = useState([]);
 
@@ -30,8 +30,8 @@ export default function HomePage() {
       .then((res) => {
         setRawData(res.data);
         setListData(res.data);
+        setLoadData(false);
       });
-    setLoadData(false);
   };
 
   const handleSearch = (e: any) => {
@@ -112,12 +112,12 @@ export default function HomePage() {
                       key={index}
                       className={`rounded-4 shadow-sm p-3 mb-3 ${styles.blur}`}
                     >
-                      <h3>{item.appName} ✅</h3>
+                      <h3>{item.appName}</h3>
                       <Link
-                        className="text-decoration-none text-black"
+                        className="border-2 rounded-pill shadow-sm px-3 py-2 bg-white btn btn-outline-success text-black me-2"
                         href={item.appLink}
                       >
-                        🔗 {item.appLink}
+                        ↗️ Buka Aplikasi
                       </Link>
                     </article>
                   ))

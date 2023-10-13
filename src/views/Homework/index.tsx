@@ -29,7 +29,7 @@ export default function HomeworkView() {
 
   useEffect(() => {
     retrieveData();
-    notification();
+    // notification();
   }, []);
 
   const retrieveData = () => {

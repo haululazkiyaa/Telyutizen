@@ -10,7 +10,10 @@ export const notification = () => {
       data = res.data;
       let htmlContent: any = "<div>";
       for (let i of res.data) {
-        if (TimeDifference(i.homeworkDeadline) <= 3) {
+        if (
+          TimeDifference(i.homeworkDeadline) <= 3 &&
+          TimeDifference(i.homeworkDeadline) >= 0
+        ) {
           htmlContent += `<p>ℹ️ ${i.homeworkTitle}</p>`;
         }
       }

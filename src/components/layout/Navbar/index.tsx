@@ -55,6 +55,7 @@ export default function Navbar() {
             type="button"
             className={`position-relative me-3 border border-0 rounded-pill shadow-sm px-3 py-2 text-white ${styles.btn__primary}`}
             onClick={() => notification()}
+            hidden
           >
             🔔 Deadline
             <span className="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle mt-2">
